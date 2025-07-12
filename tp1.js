@@ -108,7 +108,7 @@ function draw() {
   drawSky(skyDarkColor, skyLightColor);
   drawSun(sunCenterX, sunCenterY);
   drawMountains();
-  //drawLake();
+  drawLake();
 }
 
 function mousePressed() {
