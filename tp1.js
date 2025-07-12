@@ -10,6 +10,7 @@ let threshold = 20;
 let ultimoCambioColorLago = 0;
 let tiempoEspera = 300;
 
+let calibracionYaHecha = false;
 let calibrando = true;
 let tiempoInicioCalibracion;
 let maxEnergyDuringCalibration = 0;
@@ -67,6 +68,7 @@ function draw() {
   let lowEnergy = fft.getEnergy("bass");
   let midEnergy = fft.getEnergy("mid");
   let highEnergy = fft.getEnergy("treble");
+  //console.log('Energías. Low: ', lowEnergy, ', Mid: ', midEnergy, '. High: ', highEnergy);
 
   if (calibrando) {
     let ahora = millis();
@@ -77,6 +79,7 @@ function draw() {
       threshold = constrain(maxEnergyDuringCalibration + 10, 10, 50);
       console.log("Threshold calibrado automáticamente en:", threshold);
       calibrando = false;
+      calibracionYaHecha = true;
     }
   }
 
@@ -112,15 +115,17 @@ function draw() {
 }
 
 function mousePressed() {
-  userStartAudio().then(() => {
-    mic.start(() => {
-      console.log("Micrófono activado correctamente.");
-      fft.setInput(mic);
-      calibrando = true;
-      tiempoInicioCalibracion = millis();
-      maxEnergyDuringCalibration = 0;
-    }, (err) => {
-      console.error("Error al activar el micrófono:", err);
+  if (!mic.enabled && !calibracionYaHecha) {
+    userStartAudio().then(() => {
+      mic.start(() => {
+        console.log("Micrófono activado correctamente.");
+        fft.setInput(mic);
+        calibrando = true;
+        tiempoInicioCalibracion = millis();
+        maxEnergyDuringCalibration = 0;
+      }, (err) => {
+        console.error("Error al activar el micrófono:", err);
+      });
     });
-  });
+  }
 }
